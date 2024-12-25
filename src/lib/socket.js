@@ -9,8 +9,7 @@ socket.addEventListener("open", () => {
 });
 
 socket.addEventListener("message", (event) => {
-  const tradeData = JSON.parse(event.data);
-  console.log("Trade Data:", tradeData);
+  JSON.parse(event.data);
 });
 
 socket.addEventListener("close", () => {
