@@ -24,12 +24,10 @@ export default function Home() {
         }
       );
       setKlines(await response.json());
-
-      const data = await response;
-      console.log(data);
     }
 
     fetchData();
+
     function onOpen() {
       setIsConnected(true);
     }
@@ -41,6 +39,33 @@ export default function Home() {
     function onMessage(event) {
       const data: TradeData = JSON.parse(event.data);
       setTradeData(data);
+
+      const newKline: KlineData = [
+        data.k.t,
+        data.k.o,
+        data.k.h,
+        data.k.l,
+        data.k.c,
+        data.k.v,
+        data.k.T,
+        data.k.q,
+        data.k.n,
+      ];
+
+      setKlines((prevKlines) => {
+        const updatedKlines = [...prevKlines];
+        if (
+          updatedKlines.length > 0 &&
+          updatedKlines[updatedKlines.length - 1][0] === newKline[0]
+        ) {
+          // 마지막 캔들을 업데이트
+          updatedKlines[updatedKlines.length - 1] = newKline;
+        } else {
+          // 새로운 캔들을 추가
+          updatedKlines.push(newKline);
+        }
+        return updatedKlines;
+      });
     }
 
     socket.addEventListener("open", onOpen);
