@@ -1,9 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { socket } from "../lib/socket";
 import { KlineData, TradeData } from "./type/binance";
-import Chart from "react-apexcharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState(false);
@@ -58,10 +68,8 @@ export default function Home() {
           updatedKlines.length > 0 &&
           updatedKlines[updatedKlines.length - 1][0] === newKline[0]
         ) {
-          // 마지막 캔들을 업데이트
           updatedKlines[updatedKlines.length - 1] = newKline;
         } else {
-          // 새로운 캔들을 추가
           updatedKlines.push(newKline);
         }
         return updatedKlines;
@@ -81,42 +89,48 @@ export default function Home() {
 
   return (
     <div>
-      <p>Status: {isConnected ? "connected" : "disconnected"}</p>
-      {tradeData && (
-        <div>
-          <p>Event Time: {new Date(tradeData.E).toLocaleString()}</p>
-          <p>Symbol: {tradeData.s}</p>
-          <p>Price: {tradeData.k.c}</p>
-          <div id="chart">
-            <Chart
-              options={{
-                chart: {
-                  type: "candlestick",
+      <Card>
+        <CardHeader>
+          <CardTitle>Bitcoin</CardTitle>
+          <CardDescription>Price: {tradeData?.k.c}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Chart
+            options={{
+              chart: {
+                type: "candlestick",
+              },
+              xaxis: {
+                type: "category",
+                labels: {
+                  formatter: function (val, timestamp, opts) {
+                    const kline = klines.find((k) => k[0] === timestamp);
+                    return kline ? kline[4] : val; // Close price
+                  },
                 },
-                xaxis: {
-                  type: "datetime",
-                },
-              }}
-              series={[
-                {
-                  data: klines.map((k) => ({
-                    x: new Date(k[0]),
-                    y: [
-                      parseFloat(k[1]),
-                      parseFloat(k[2]),
-                      parseFloat(k[3]),
-                      parseFloat(k[4]),
-                    ],
-                  })),
-                },
-              ]}
-              type="candlestick"
-              height={350}
-            />
-          </div>
-          <div id="html-dist"></div>
-        </div>
-      )}
+              },
+            }}
+            series={[
+              {
+                data: klines.map((k) => ({
+                  x: k[0], // Open time
+                  y: [
+                    parseFloat(k[1]), // Open
+                    parseFloat(k[2]), // High
+                    parseFloat(k[3]), // Low
+                    parseFloat(k[4]), // Close
+                  ],
+                })),
+              },
+            ]}
+            type="candlestick"
+            height={350}
+          />
+        </CardContent>
+        <CardFooter>
+          <p>Card Footer</p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

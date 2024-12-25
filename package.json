@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "@binance/connector": "^3.6.0",
+    "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.1.6",
     "@tanstack/react-query": "^5.62.10",
     "@vercel/node": "^5.0.0",
     "apexcharts": "^4.3.0",
